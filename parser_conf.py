@@ -67,7 +67,7 @@ def validate_conf(config_path: str) -> Mazeconf:
         print("config.txt not found. Error reading file")
         sys.exit(1)
 
-    difference = required_keys - sanitized.keys() # Comparo con las keys del dict
+    difference = required_keys - sanitized.keys()  # Comparo con las keys del dict
     if difference:
         raise ValueError("Missing keys required.")
 
@@ -86,6 +86,10 @@ def validate_conf(config_path: str) -> Mazeconf:
             raise ValueError(f"Entry coordinates: {entry_coords} not valid.")
         if (exit_coords[0] < 0 or exit_coords[0] < height or exit_coords[1] < 0 or exit_coords[1] < height):
             raise ValueError(f"Entry coordinates: {exit_coords} not valid.")
+        if width < 3 or height < 3:
+            raise ValueError("Maze should be at least 3x3")
+        if width < 8 or height < 6:
+            print("Maze should be at least 8x6 to generate 42")
 
         seed: Optional[int] = None
         if "SEED" in sanitized:
@@ -109,19 +113,3 @@ def validate_conf(config_path: str) -> Mazeconf:
         )
     except ValueError as e:
         raise ValueError(f"Invalid configuration file: {e}")
-
-
-def main() -> None:
-    if len(sys.argv) != 2:
-        print("Usage: python3 parser-conf.py config.txt")
-        sys.exit(1)
-
-    config = validate_conf(sys.argv[1])
-    if config is None:
-        sys.exit(1)
-
-    print(config)
-
-
-if __name__ == "__main__":
-    main()
