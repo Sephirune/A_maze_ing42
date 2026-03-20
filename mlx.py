@@ -39,4 +39,5 @@ class MlxDisplay:
 
         self.config = config  # Config va a ser la config validada
         self.lib = load_mlx()
+        
 
