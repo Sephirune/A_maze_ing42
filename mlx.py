@@ -29,7 +29,7 @@ color_list: list[int] = [
 def load_mlx() -> ctypes.CDLL:
     """Load MiniLibX library"""
 
-    path = os.path.join(os.path.dirname(__file__), "lib", "libmlx42.so") # si no encuentra la libreria: OSError.
+    path = os.path.join(os.path.dirname(__file__), "lib", "libmlx42.so") # si no encuentra la libreria da: OSError.
     return ctypes.CDLL(path)
 
 
@@ -46,7 +46,7 @@ class MlxDisplay:
         win_width = config.width * cell_size
         win_height = config.height * cell_size
 
-        # La lógica de esto la he sacado del ejemplo que está en el git de codam. Pasé la lógica de c a python. 
+        # La lógica de esto la he sacado del ejemplo que está en el git de codam. Pasé la lógica de c a python.
         # Cosas como mlx_init o mlx_new_image ya están cargadas en el so de la librería, así que esto es más fácil.
         self.mlx = self.lib.mlx_init(win_width, win_height, b"A-Maze-ing",
                                      True)
