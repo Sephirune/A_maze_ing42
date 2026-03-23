@@ -35,6 +35,8 @@ class MlxDisplay:
         self.config = config
         self.lib = load_mlx()
         self.setup_signatures()
+        self.grid = None
+        self.color_index = 0
 
         self.win_width = config.width * cell_size
         self.win_height = config.height * cell_size
@@ -143,28 +145,42 @@ class MlxDisplay:
                 self.draw_vline(x1 + offset, y1, y2, self.wall_color)
             if cell.has_wall(EAST):
                 self.draw_vline(x2 - offset, y1, y2, self.wall_color)
-    
+
     def handle_key(self):
         """Handles the key choices"""
-        
         @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
         def keys(key, param):
-            if key == 256:
+            if key == 256:  # ESC
                 print("Exit")
                 sys.exit(1)
-            elif key == 82:
+
+            elif key == 82:  # R
                 pass
-                self.draw_maze(0, 0)
-            elif key == 80:
-                pass
-            elif key == 67:
-                pass
-        
+
+            elif key == 80:  # P
+                self.show_path = not self.show_path
+                print(f"Show path: {self.show_path}")
+                if self.grid:
+                    self.draw_maze(self.grid)
+
+            elif key == 67:  # C
+                self.color_index = (self.color_index + 1) % len(color_list)
+                self.wall_color = color_list[self.color_index]
+                print(f"Wall color index: {self.color_index}")
+                if self.grid:
+                    self.draw_maze(self.grid)
+
         self.key_callback = keys
         self.lib.mlx_key_hook(self.mlx, self.key_callback, None)
 
+    def clear_image(self):
+        """Clears the image before regenerate"""
+        self.draw_rectangle(0, 0, self.win_width, self.win_height, color_floor)
+
     def draw_maze(self, grid: list[list[Cell]]) -> None:
         """Draw the full maze grid."""
+        self.clear_image()
         for row in grid:
             for cell in row:
                 self.draw_cell(cell)
+                
