@@ -144,3 +144,31 @@ class MlxDisplay:
         for row in range(self.config.height):
             for col in range(self.config.width):
                 self.draw_cell(row, col, random_color())
+    
+    def handle_key(self, choice: int):
+        """Handles they key choices"""
+        
+        while True:
+            print("\n=== A-Maze-ing ===")
+            print("1. Re-generate maze")
+            print("2. Show/Hide path")
+            print("3. Change wall colour")
+            print("4. Quit")
+            try:
+                choice: int = int(input("Choice (1-4): ").strip())
+            except ValueError:
+                print("Invalid choice. Please enter a number between 1 and 4.")
+                continue
+
+            match choice:
+                case 1:
+                    
+                case 2:
+                    show_path =
+                case 3:
+                    color_index = handle_colors(color_list, color_index)
+                case 4:
+                    print("Goodbye!")
+                    break
+                case _:
+                    print("Invalid choice. Please enter a number between 1 and 4.")
