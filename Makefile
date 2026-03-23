@@ -1,39 +1,43 @@
-PYTHON      = python3
+PYTHON      = $(VENV)/bin/python
+PIP         = $(VENV)/bin/pip
 MAIN        = a_maze_ing.py
 CONFIG      = config.txt
 VENV        = .venv
-PIP         = pip
 
-.PHONY: install run debug lint lint-strict  venv clean
+.PHONY: install run debug lint lint-strict venv clean
 
-install: # Instalar dependencias
-		$(PIP) install -r requirements.txt
+install: venv
+	$(PIP) install --upgrade pip
+	$(PIP) install mlx
+	# or: $(PIP) install -r requirements.txt
 
-run:
+run: venv
 	$(PYTHON) $(MAIN) $(CONFIG)
 
-debug:
+debug: venv
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
 
-lint: # Verificación del linting (estilo del código)
-	flake8 .
-	mypy . \
+lint: venv
+	$(PIP) install flake8 mypy
+	$(VENV)/bin/flake8 .
+	$(VENV)/bin/mypy . \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
 		--disallow-untyped-defs \
 		--check-untyped-defs
 
-lint-strict:
-	flake8
-	mypy . --strict
+lint-strict: venv
+	$(PIP) install flake8 mypy
+	$(VENV)/bin/flake8 .
+	$(VENV)/bin/mypy . --strict
 
-venv: # Crear entorno virtual
-		python3 -m venv $(VENV)
-		@echo "Activate with: source venv/bin/activate"
+venv:
+	python3 -m venv $(VENV)
+	@echo "Activate with: source $(VENV)/bin/activate"
 
-clean: # Limpiar los archivos de caché y artefacto
-		find . -type f -name "*.pyc" -delete
-		find . -type d -name "__pycache__" -delete
-		find . -type d -name ".mypy_cache" -exec rm -rf {} +
-		rm -rf build/ dist/ .coverage htmlcov/ .pytest_cache/
+clean:
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	rm -rf build/ dist/ .coverage htmlcov/ .pytest_cache/ $(VENV)
