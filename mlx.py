@@ -152,14 +152,13 @@ class MlxDisplay:
             if key == 256:
                 print("Exit")
                 sys.exit(1)
-            elif key ==  82:
-                aqui iria el generar un nuevo laberinto
+            elif key == 82:
+                pass
                 self.draw_maze(0, 0)
             elif key == 80:
-                
-            
+                pass
             elif key == 67:
-                handle_colors(color_list, 0)
+                pass
         
         self.key_callback = keys
         self.lib.mlx_key_hook(self.mlx, self.key_callback, None)
