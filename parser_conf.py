@@ -30,7 +30,7 @@ def parse_coords(key: str) -> tuple[int, int]:
         coord2 = coords[1].strip()
         return (int(coord1), int(coord2))
     except ValueError:
-        print(f"Invalid entry format: {key}. Entry must be int.")
+        raise ValueError(f"Invalid entry format: {key}. Entry must be int.")
 
 
 def parse_bool(value: str) -> bool:
@@ -62,14 +62,17 @@ def validate_conf(config_path: str) -> Mazeconf:
                 if '=' not in line:
                     raise ValueError("Invalid config syntax.")
                 key, sign, values = line.partition("=") # Partition devuelve una tupla con 3 elementos: antes del objetivo, la palabra a buscar, y lo siguiente.
+
+                if sign != "=":
+                    raise ValueError("Invalid config syntax.")
+
                 sanitized[key.strip()] = values.strip()
     except FileNotFoundError:
-        print("config.txt not found. Error reading file")
-        sys.exit(1)
+        raise ValueError("config.txt not found. Error reading file")
 
     difference = required_keys - sanitized.keys()  # Comparo con las keys del dict
     if difference:
-        raise ValueError("Missing keys required.")
+        raise ValueError(f"Missing keys required: {difference}")
 
     try:
         width = int(sanitized["WIDTH"])
@@ -80,15 +83,22 @@ def validate_conf(config_path: str) -> Mazeconf:
         entry_coords = parse_coords(sanitized["ENTRY"])
         exit_coords = parse_coords(sanitized["EXIT"])
 
+        if not isinstance(entry_coords, tuple) or len(entry_coords) != 2:
+            raise ValueError("Invalid ENTRY format.")
+
         if entry_coords == exit_coords:
             raise ValueError("ENTRY and EXIT must be different coordinates")
+
         if not (0 <= entry_coords[0] < width and
                 0 <= entry_coords[1] < height):
             raise ValueError(f"Entry coordinates: {entry_coords} not valid.")
+
         if not (0 <= exit_coords[0] < width and 0 <= exit_coords[1] < height):
-            raise ValueError(f"Entry coordinates: {exit_coords} not valid.")
+            raise ValueError(f"Exit coordinates: {exit_coords} not valid.")
+
         if width < 3 or height < 3:
             raise ValueError("Maze should be at least 3x3")
+
         if width < 8 or height < 6:
             print("Maze should be at least 8x6 to generate 42")
 
@@ -103,6 +113,7 @@ def validate_conf(config_path: str) -> Mazeconf:
 
         perfect = parse_bool(sanitized["PERFECT"])
 
+        random.seed(seed)
         return Mazeconf(
             width=width,
             height=height,
