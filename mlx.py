@@ -186,6 +186,9 @@ class MlxDisplay:
                 if self.grid:
                     self.draw_maze(self.grid)
 
+            self.lib.mlx_key_hook(self.mlx, keys, None)
+            self.keys_call_back = keys  # Se guarda para que no la elimine el garbage collector
+
     def clear_image(self):
         """Clears the image before regenerate"""
         self.draw_rectangle(0, 0, self.win_width, self.win_height, color_floor)
@@ -196,4 +199,3 @@ class MlxDisplay:
         for row in grid:
             for cell in row:
                 self.draw_cell(cell)
-                
