@@ -3,6 +3,11 @@ import os
 import sys
 from parser_conf import Mazeconf
 from typing import Optional
+import random
+
+
+def random_color() -> int:
+    return random.randint(0, 0xFFFFFFFF)
 
 
 cell_size: int = 20
@@ -56,13 +61,16 @@ class MlxDisplay:
 
         # La lógica de esto la he sacado del ejemplo que está en el git de codam. Pasé la lógica de c a python.
         # Cosas como mlx_init o mlx_new_image ya están cargadas en el so de la librería, así que esto es más fácil.
-        self.mlx = self.lib.mlx_init(self.win_width, self.win_height, b"A-Maze-ing",
-                                     True)
+        self.mlx = self.lib.mlx_init(
+            self.win_width, self.win_height, b"A-Maze-ing", True
+            )
         if not self.mlx:
             print("Error: Failed to load mlx init.")
             sys.exit(1)
 
-        self.img = self.lib.mlx_new_image(self.mlx, self.win_width, self.win_height,)
+        self.img = self.lib.mlx_new_image(
+            self.mlx, self.win_width, self.win_height
+            )
 
         if not self.img:
             print("Error: Failed to load img.")
@@ -79,16 +87,24 @@ class MlxDisplay:
         corrupts 64-bit pointers."""
 
         self.lib.mlx_init.restype = ctypes.c_void_p
-        self.lib.mlx_init.argtypes = [ctypes.c_int32, ctypes.c_int32, ctypes.c_char_p, ctypes.c_bool]
+        self.lib.mlx_init.argtypes = [
+            ctypes.c_int32, ctypes.c_int32, ctypes.c_char_p, ctypes.c_bool
+            ]
 
         self.lib.mlx_new_image.restype = ctypes.c_void_p
-        self.lib.mlx_new_image.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32]
+        self.lib.mlx_new_image.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32
+            ]
 
         self.lib.mlx_image_to_window.restype = ctypes.c_int
-        self.lib.mlx_image_to_window.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+        self.lib.mlx_image_to_window.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int
+            ]
 
         self.lib.mlx_put_pixel.restype = None
-        self.lib.mlx_put_pixel.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32]
+        self.lib.mlx_put_pixel.argtypes = [
+            ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32
+            ]
 
         self.lib.mlx_loop.restype = None
         self.lib.mlx_loop.argtypes = [ctypes.c_void_p]
@@ -116,14 +132,15 @@ class MlxDisplay:
     def draw_cell(self, row: int, col: int, color: int) -> None:
         """Creates and fills cells"""
 
-        x1 = row * cell_size
-        y1 = col * cell_size
+        x1 = col * cell_size
+        y1 = row * cell_size
         x2 = x1 + cell_size - 1
         y2 = y1 + cell_size - 1
 
         self.draw_rectangle(x1, y1, x2, y2, color)
-    
-    def draw_maze(self, x: int, y: int, color: int) -> None:
+
+    def draw_maze(self, row: int, col: int) -> None:
         """Draws the whole maze"""
-        
-        self.draw_rectangle()
+        for row in range(self.config.height):
+            for col in range(self.config.width):
+                self.draw_cell(row, col, random_color())
