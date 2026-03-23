@@ -98,8 +98,9 @@ class MlxDisplay:
             for y in range(y1, y2 + 1):
                 for x in range(x1, x2 + 1):
                     self.draw_pixel(self.mlx, x, y, color)
-        except:
-            raise ValueError("Error filling the matrix.")
+        except ValueError:
+            print("Error filling the matrix.")
+            sys.exit(1)
 
     def draw_cell(self, row: int, col: int, color: int) -> None:
         """Creates and fills cells"""
@@ -111,4 +112,7 @@ class MlxDisplay:
 
         self.draw_rectangle(self.mlx, x1, y1, x2, y2, color)
     
-    def draw_maze
+    def draw_maze(self, x: int, y: int, color: int) -> None:
+        """Draws the whole maze"""
+        
+        self.draw_rectangle()
