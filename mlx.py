@@ -33,6 +33,14 @@ def load_mlx() -> ctypes.CDLL:
     return ctypes.CDLL(path)
 
 
+def handle_colors(colors: list[str], index: int) -> int:
+    """Cycle to the next wall color and print it"""
+
+    index = (index + 1) % len(colors)
+    print(f"Next color -> {colors[index]}")
+    return index
+
+
 class MlxDisplay:
     """Handles MiniLibX display of the maze"""
 
@@ -62,7 +70,7 @@ class MlxDisplay:
 
         if self.lib.mlx_image_to_window(self.mlx, self.img, 0, 0) == -1:
             print("Error: Failed to create window")
-            sys.exit(1)     
+            sys.exit(1)
 
     def setup_signatures(self) -> None:
         """Fixes an error in python with the ctypes and the pointer-return.
