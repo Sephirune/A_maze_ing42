@@ -144,31 +144,24 @@ class MlxDisplay:
         for row in range(self.config.height):
             for col in range(self.config.width):
                 self.draw_cell(row, col, random_color())
-    
-    def handle_key(self, choice: int):
-        """Handles they key choices"""
-        
-        while True:
-            print("\n=== A-Maze-ing ===")
-            print("1. Re-generate maze")
-            print("2. Show/Hide path")
-            print("3. Change wall colour")
-            print("4. Quit")
-            try:
-                choice: int = int(input("Choice (1-4): ").strip())
-            except ValueError:
-                print("Invalid choice. Please enter a number between 1 and 4.")
-                continue
 
-            match choice:
-                case 1:
-                    
-                case 2:
-                    show_path =
-                case 3:
-                    color_index = handle_colors(color_list, color_index)
-                case 4:
-                    print("Goodbye!")
-                    break
-                case _:
-                    print("Invalid choice. Please enter a number between 1 and 4.")
+    
+    def handle_key(self):
+        """Handles the key choices"""
+        
+        @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
+        def keys(key, param):
+            if key == 256:
+                print("Exit")
+                sys.exit(1)
+            elif key ==  82:
+                aqui iria el generar un nuevo laberinto
+                self.draw_maze(0, 0)
+            elif key == 80:
+                
+            
+            elif key == 67:
+                handle_colors(color_list, 0)
+        
+        self.key_callback = keys
+        self.lib.mlx_key_hook(self.mlx, self.key_callback, None)
