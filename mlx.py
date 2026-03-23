@@ -10,7 +10,7 @@ def random_color() -> int:
     return random.randint(0, 0xFFFFFFFF)
 
 
-cell_size: int = 20
+cell_size: int = 35
 color_wall: int = 0xFFFFFFFF  # Blanco
 color_floor: int = 0x000000FF  # Negro
 color_entry: int = 0x00FF00FF  # Verde

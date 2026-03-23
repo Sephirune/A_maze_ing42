@@ -30,7 +30,7 @@ def parse_coords(key: str) -> tuple[int, int]:
         coord2 = coords[1].strip()
         return (int(coord1), int(coord2))
     except ValueError:
-        raise ValueError(f"Invalid entry format: {key}. Entry must be int.")
+        print(f"Invalid entry format: {key}. Entry must be int.")
 
 
 def parse_bool(value: str) -> bool:
@@ -51,7 +51,7 @@ def validate_conf(config_path: str) -> Mazeconf:
                      "PERFECT"}
 
     try:
-        with open("config.txt", "r") as f:
+        with open(config_path, "r") as f:
             sanitized: dict[str, str] = {}
             for line in f:
                 line = line.strip()
