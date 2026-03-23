@@ -84,5 +84,31 @@ class MlxDisplay:
 
     def draw_pixel(self, x: int, y: int, color: int) -> None:
         """Draw a pixel on the map"""
-        
-        self.lib.mlx_put_pixel(self.img, self.win_width, self.win_height, 0xFFFFFFFF)
+
+        self.lib.mlx_put_pixel(self.img, x, y, color)
+
+    def draw_rectangle(self, x1: int, y1: int, x2: int, y2: int, color: int) -> None:
+        """Draw and fill a rectangle"""
+
+        if x1 > x2 or y1 > y2:
+            print("Error: Invalid size.")
+            sys.exit(1)
+
+        try:
+            for y in range(y1, y2 + 1):
+                for x in range(x1, x2 + 1):
+                    self.draw_pixel(self.mlx, x, y, color)
+        except:
+            raise ValueError("Error filling the matrix.")
+
+    def draw_cell(self, row: int, col: int, color: int) -> None:
+        """Creates and fills cells"""
+
+        x1 = row * cell_size
+        y1 = col * cell_size
+        x2 = x1 * cell_size - 1
+        y2 = y1 * cell_size - 1
+
+        self.draw_rectangle(self.mlx, x1, y1, x2, y2, color)
+    
+    def draw_maze
