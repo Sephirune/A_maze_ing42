@@ -82,10 +82,11 @@ def validate_conf(config_path: str) -> Mazeconf:
 
         if entry_coords == exit_coords:
             raise ValueError("ENTRY and EXIT must be different coordinates")
-        """ if (entry_coords[0] < 0 or entry_coords[0] < width or entry_coords[1] < 0 or entry_coords[1] < width):
+        if not (0 <= entry_coords[0] < width and
+                0 <= entry_coords[1] < height):
             raise ValueError(f"Entry coordinates: {entry_coords} not valid.")
-        if (exit_coords[0] < 0 or exit_coords[0] < height or exit_coords[1] < 0 or exit_coords[1] < height):
-            raise ValueError(f"Entry coordinates: {exit_coords} not valid.") """
+        if not (0 <= exit_coords[0] < width and 0 <= exit_coords[1] < height):
+            raise ValueError(f"Entry coordinates: {exit_coords} not valid.")
         if width < 3 or height < 3:
             raise ValueError("Maze should be at least 3x3")
         if width < 8 or height < 6:
