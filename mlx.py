@@ -86,6 +86,16 @@ class MlxDisplay:
         self.lib.mlx_loop.restype = None
         self.lib.mlx_loop.argtypes = [ctypes.c_void_p]
 
+        self.lib.mlx_key_hook.restype = None
+        self.lib.mlx_key_hook.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_void_p,
+            ctypes.c_void_p
+        ]
+
+        self.lib.mlx_close_window.restype = None
+        self.lib.mlx_close_window.argtypes = [ctypes.c_void_p]
+
     def draw_pixel(self, x: int, y: int, color: int) -> None:
         """Draw one pixel if it is inside the image."""
         if 0 <= x < self.win_width and 0 <= y < self.win_height:
@@ -148,11 +158,17 @@ class MlxDisplay:
 
     def handle_key(self):
         """Handles the key choices"""
+        self.last_key = None
+
         @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
         def keys(key, param):
+            if key == self.last_key:
+                return
+            self.last_key = key
+
             if key == 256:  # ESC
                 print("Exit")
-                sys.exit(1)
+                self.lib.mlx_close_window(self.mlx)
 
             elif key == 82:  # R
                 pass
@@ -169,9 +185,6 @@ class MlxDisplay:
                 print(f"Wall color index: {self.color_index}")
                 if self.grid:
                     self.draw_maze(self.grid)
-
-        self.key_callback = keys
-        self.lib.mlx_key_hook(self.mlx, self.key_callback, None)
 
     def clear_image(self):
         """Clears the image before regenerate"""

@@ -17,6 +17,7 @@ def main():
     print("Rectangle drawn OK")
     display.lib.mlx_loop.restype = ctypes.c_void_p
     print("Starting mlx_loop...")
+    display.handle_key()
     display.lib.mlx_loop(display.mlx)
 
 
