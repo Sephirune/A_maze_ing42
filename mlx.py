@@ -79,8 +79,19 @@ class MlxDisplay:
         corrupts 64-bit pointers."""
 
         self.lib.mlx_init.restype = ctypes.c_void_p
+        self.lib.mlx_init.argtypes = [ctypes.c_int32, ctypes.c_int32, ctypes.c_char_p, ctypes.c_bool]
+
         self.lib.mlx_new_image.restype = ctypes.c_void_p
+        self.lib.mlx_new_image.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32]
+
         self.lib.mlx_image_to_window.restype = ctypes.c_int
+        self.lib.mlx_image_to_window.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+
+        self.lib.mlx_put_pixel.restype = None
+        self.lib.mlx_put_pixel.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint32]
+
+        self.lib.mlx_loop.restype = None
+        self.lib.mlx_loop.argtypes = [ctypes.c_void_p]
 
     def draw_pixel(self, x: int, y: int, color: int) -> None:
         """Draw a pixel on the map"""
@@ -97,7 +108,7 @@ class MlxDisplay:
         try:
             for y in range(y1, y2 + 1):
                 for x in range(x1, x2 + 1):
-                    self.draw_pixel(self.mlx, x, y, color)
+                    self.draw_pixel(x, y, color)
         except ValueError:
             print("Error filling the matrix.")
             sys.exit(1)
@@ -107,10 +118,10 @@ class MlxDisplay:
 
         x1 = row * cell_size
         y1 = col * cell_size
-        x2 = x1 * cell_size - 1
-        y2 = y1 * cell_size - 1
+        x2 = x1 + cell_size - 1
+        y2 = y1 + cell_size - 1
 
-        self.draw_rectangle(self.mlx, x1, y1, x2, y2, color)
+        self.draw_rectangle(x1, y1, x2, y2, color)
     
     def draw_maze(self, x: int, y: int, color: int) -> None:
         """Draws the whole maze"""
