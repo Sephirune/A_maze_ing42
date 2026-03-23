@@ -51,18 +51,18 @@ class MlxDisplay:
         self.lib = load_mlx()
         self.setup_signatures()
 
-        win_width = config.width * cell_size
-        win_height = config.height * cell_size
+        self.win_width = config.width * cell_size
+        self.win_height = config.height * cell_size
 
         # La lógica de esto la he sacado del ejemplo que está en el git de codam. Pasé la lógica de c a python.
         # Cosas como mlx_init o mlx_new_image ya están cargadas en el so de la librería, así que esto es más fácil.
-        self.mlx = self.lib.mlx_init(win_width, win_height, b"A-Maze-ing",
+        self.mlx = self.lib.mlx_init(self.win_width, self.win_height, b"A-Maze-ing",
                                      True)
         if not self.mlx:
             print("Error: Failed to load mlx init.")
             sys.exit(1)
 
-        self.img = self.lib.mlx_new_image(self.mlx, win_width, win_height,)
+        self.img = self.lib.mlx_new_image(self.mlx, self.win_width, self.win_height,)
 
         if not self.img:
             print("Error: Failed to load img.")
@@ -81,3 +81,8 @@ class MlxDisplay:
         self.lib.mlx_init.restype = ctypes.c_void_p
         self.lib.mlx_new_image.restype = ctypes.c_void_p
         self.lib.mlx_image_to_window.restype = ctypes.c_int
+
+    def draw_pixel(self, x: int, y: int, color: int) -> None:
+        """Draw a pixel on the map"""
+        
+        self.lib.mlx_put_pixel(self.img, self.win_width, self.win_height, 0xFFFFFFFF)
