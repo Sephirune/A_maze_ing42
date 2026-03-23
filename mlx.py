@@ -143,6 +143,26 @@ class MlxDisplay:
                 self.draw_vline(x1 + offset, y1, y2, self.wall_color)
             if cell.has_wall(EAST):
                 self.draw_vline(x2 - offset, y1, y2, self.wall_color)
+    
+    def handle_key(self):
+        """Handles the key choices"""
+        
+        @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
+        def keys(key, param):
+            if key == 256:
+                print("Exit")
+                sys.exit(1)
+            elif key ==  82:
+                aqui iria el generar un nuevo laberinto
+                self.draw_maze(0, 0)
+            elif key == 80:
+                
+            
+            elif key == 67:
+                handle_colors(color_list, 0)
+        
+        self.key_callback = keys
+        self.lib.mlx_key_hook(self.mlx, self.key_callback, None)
 
     def draw_maze(self, grid: list[list[Cell]]) -> None:
         """Draw the full maze grid."""
