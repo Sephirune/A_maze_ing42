@@ -1,24 +1,67 @@
-from mlx import MlxDisplay, cell_size
-import parser_conf
-import ctypes
-from sys import argv
-from cell import Cell, NORTH, EAST, SOUTH, WEST
-from mazegen import build_initial_grid
+from __future__ import annotations
+
+import sys
+
+from config import validate_conf
+from generator import MazeGenerator
+from mlx_display import MlxDisplay
+from solver import mark_path, shortest_path
+from writer import write_output_file
 
 
-def main():
-    config = parser_conf.validate_conf(argv[1])
-    print("Config OK")
-    display = MlxDisplay(config)
-    print("MlxDisplay created OK")
-    print(f"Drawing rectangle: 4, 5, {config.width * cell_size}, {config.height * cell_size}")
-    grid = build_initial_grid(config)
-    display.draw_maze(grid)
-    print("Rectangle drawn OK")
-    display.lib.mlx_loop.restype = ctypes.c_void_p
-    print("Starting mlx_loop...")
-    display.handle_key()
-    display.lib.mlx_loop(display.mlx)
+def main() -> int:
+    """Run the maze generator application."""
+    if len(sys.argv) != 2:
+        print("Usage: python3 a_maze_ing.py config.txt")
+        return 1
+
+    try:
+        config = validate_conf(sys.argv[1])
+        print("Config OK")
+
+        generator = MazeGenerator(
+            width=config.width,
+            height=config.height,
+            entry=config.entry,
+            exit=config.exit,
+            seed=config.seed,
+            perfect=config.perfect,
+        )
+        maze = generator.generate()
+
+        path_dirs = shortest_path(maze, config.entry, config.exit)
+        mark_path(maze, config.entry, path_dirs)
+
+        write_output_file(
+            output_file=config.output_file,
+            maze=maze,
+            entry=config.entry,
+            exit=config.exit,
+            path_dirs=path_dirs,
+        )
+
+        display = MlxDisplay(
+            maze=maze,
+            entry=config.entry,
+            exit=config.exit,
+            seed=config.seed,
+            perfect=config.perfect,
+        )
+        print("MlxDisplay created OK")
+        print("Starting mlx_loop...")
+        display.run()
+        return 0
+
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        return 1
+    except OSError as exc:
+        print(f"System error: {exc}")
+        return 1
+    except KeyboardInterrupt:
+        print("\nInterrupted.")
+        return 1
 
 
-main()
+if __name__ == "__main__":
+    raise SystemExit(main())
