@@ -29,7 +29,7 @@ color_list: list[int] = [
 
 def load_mlx() -> ctypes.CDLL:
     """Load MiniLibX library."""
-    path = os.path.join(os.path.dirname(__file__), "lib", "libmlx42.so")
+    path: str = os.path.join(os.path.dirname(__file__), "lib", "libmlx42.so")
     return ctypes.CDLL(path)
 
 
@@ -174,10 +174,10 @@ class MlxDisplay:
 
     def draw_cell(self, cell: Cell) -> None:
         """Draw one maze cell from its state and walls."""
-        x1 = cell.col * cell_size
-        y1 = cell.row * cell_size
-        x2 = x1 + cell_size - 1
-        y2 = y1 + cell_size - 1
+        x1: int = cell.col * cell_size
+        y1: int = cell.row * cell_size
+        x2: int = x1 + cell_size - 1
+        y2: int = y1 + cell_size - 1
 
         self.draw_rectangle(x1, y1, x2, y2, self.get_cell_background(cell))
 
@@ -212,7 +212,7 @@ class MlxDisplay:
 
     def regenerate(self) -> None:
         """Generate and draw a new maze."""
-        next_seed = None if self.seed is None else self.seed + 1
+        next_seed: int | None = None if self.seed is None else self.seed + 1
         self.seed = next_seed
 
         generator = MazeGenerator(
@@ -238,32 +238,33 @@ class MlxDisplay:
 
         @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
         def keys(key, param):
-            if key == self.last_key:
-                return
-            self.last_key = key
-
             if key == 256:  # ESC
                 print("Exit")
                 self.lib.mlx_close_window(self.mlx)
 
             elif key == 82:  # R
-                pass
+                self.regenerate()
 
             elif key == 80:  # P
                 self.show_path = not self.show_path
                 print(f"Show path: {self.show_path}")
-                if self.grid:
-                    self.draw_maze(self.grid)
+                self.path_dirs = shortest_path(self.maze, self.entry, self.exit)
+                if self.show_path:
+                    mark_path(self.maze, self.entry, self.path_dirs)
+                else:
+                    for row in self.maze.grid:
+                        for cell in row:
+                            cell.is_path = False
+                self.draw_maze(self.maze)
 
             elif key == 67:  # C
                 self.color_index = (self.color_index + 1) % len(color_list)
                 self.wall_color = color_list[self.color_index]
                 print(f"Wall color index: {self.color_index}")
-                if self.grid:
-                    self.draw_maze(self.grid)
+                self.draw_maze(self.maze)
 
-            self.lib.mlx_key_hook(self.mlx, keys, None)
-            self.keys_call_back = keys  # Se guarda para que no la elimine el garbage collector
+        self.lib.mlx_key_hook(self.mlx, keys, None)
+        self.keys_call_back = keys  # Se guarda para que no la elimine el garbage collector
 
     def run(self) -> None:
         """Register callbacks and start MLX loop."""
