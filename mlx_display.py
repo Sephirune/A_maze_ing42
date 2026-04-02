@@ -3,6 +3,7 @@ from __future__ import annotations
 import ctypes
 import os
 import sys
+import time
 
 from cell import EAST, NORTH, SOUTH, WEST, Cell
 from generator import MazeGenerator
@@ -238,6 +239,11 @@ class MlxDisplay:
 
         @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
         def keys(key, param):
+            if self.last_key == key:
+                return
+
+            self.last_key = key
+
             if key == 256:  # ESC
                 print("Exit")
                 self.lib.mlx_close_window(self.mlx)
