@@ -227,7 +227,7 @@ The module format (Cell bitmask) is identical to the output file format.
 | Member | Responsibilities |
 |---|---|
 | aarogarc | Frontend: config parser, MLX42 display, keyboard interaction, menu, a_maze_ing.py |
-| [login2] | Backend: MazeGenerator, Maze, Cell, solver (BFS), writer, reusable package |
+| guantino | Backend: MazeGenerator, Maze, Cell, solver (BFS), writer, reusable package |
 
 ### Planning
 
