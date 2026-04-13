@@ -270,6 +270,7 @@ The main deviation from the original plan was the time spent on MLX42 integratio
 ### AI usage
 
 | How AI was used |
+| Task | How AI was used |
 |---|---|
 | MLX42 + ctypes integration | Understanding `restype`/`argtypes`, debugging 64-bit pointer corruption, translating the C example to Python |
 | Config parser | Reviewing validation logic and identifying bugs (bounds check, `open()` path) |
