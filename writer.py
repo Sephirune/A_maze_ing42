@@ -28,4 +28,6 @@ def write_output_file(
             file.write(f"{exit[0]},{exit[1]}\n")
             file.write("".join(path_dirs) + "\n")
     except OSError as exc:
-        raise ValueError(f"Failed to write output file '{output_file}': {exc}") from exc
+        raise ValueError(
+            f"Failed to write output file '{output_file}': {exc}"
+        )from exc

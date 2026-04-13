@@ -54,16 +54,18 @@ class MazeGenerator:
 
     def _can_place_42(self) -> bool:
         """Return True if the maze is big enough for a simple 42 pattern."""
-        return self.width >= 8 and self.height >= 6
+        return self.width >= 15 and self.height >= 15
 
     def _place_42_pattern(self, maze: Maze) -> None:
         """Place a simple blocked-cell '42' pattern near the center."""
         pattern = [
-            "1001110",
-            "1000010",
-            "1111110",
-            "0000010",
-            "0000010",
+            "10010011111",
+            "10010000001",
+            "10010000001",
+            "11110011111",
+            "00010010000",
+            "00010010000",
+            "00010011111",
         ]
 
         pattern_height = len(pattern)

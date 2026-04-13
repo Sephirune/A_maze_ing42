@@ -39,7 +39,8 @@ class Maze:
                 current_row.append(cell)
             grid.append(current_row)
 
-        return cls(width=width, height=height, entry=entry, exit=exit, grid=grid)
+        return cls(width=width, height=height, entry=entry, exit=exit,
+                   grid=grid)
 
     def in_bounds(self, row: int, col: int) -> bool:
         """Return True if the given row and col are inside the maze."""

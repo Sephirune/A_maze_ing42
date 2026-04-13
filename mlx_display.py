@@ -3,7 +3,6 @@ from __future__ import annotations
 import ctypes
 import os
 import sys
-import time
 
 from cell import EAST, NORTH, SOUTH, WEST, Cell
 from generator import MazeGenerator
@@ -18,7 +17,7 @@ color_floor: int = 0x000000FF
 color_entry: int = 0x00FF00FF
 color_exit: int = 0xFF0000FF
 color_path: int = 0x00FFFFFF
-color_blocked: int = 0x777777FF
+color_blocked: int = 0xBBBBBBFF
 
 color_list: list[int] = [
     0xFFFFFFFF,
@@ -26,6 +25,11 @@ color_list: list[int] = [
     0x00FF00FF,
     0x4444FFFF,
 ]
+
+KEY_ESC: int = 256
+KEY_R: int = 82
+KEY_P: int = 80
+KEY_C: int = 67
 
 
 def load_mlx() -> ctypes.CDLL:
@@ -45,6 +49,7 @@ class MlxDisplay:
         seed: int | None,
         perfect: bool,
     ) -> None:
+        """Initialize MLX42 window and image buffer."""
         self.maze = maze
         self.entry = entry
         self.exit = exit
@@ -54,13 +59,15 @@ class MlxDisplay:
         self.lib = load_mlx()
         self.setup_signatures()
 
-        self.color_index = 0
-        self.wall_color = color_wall
-        self.show_path = True
-        self.last_key: int | None = None
+        self.color_index: int = 0
+        self.wall_color: int = color_wall
+        self.show_path: bool = True
 
-        self.win_width = maze.width * cell_size
-        self.win_height = maze.height * cell_size
+        # tracks which keys were down last frame to detect press edge
+        self.key_pressed: dict[int, bool] = {}
+
+        self.win_width: int = maze.width * cell_size
+        self.win_height: int = maze.height * cell_size
 
         self.mlx = self.lib.mlx_init(
             self.win_width, self.win_height, b"A-Maze-ing", True
@@ -69,7 +76,9 @@ class MlxDisplay:
             print("Error: failed to initialize MLX.")
             sys.exit(1)
 
-        self.img = self.lib.mlx_new_image(self.mlx, self.win_width, self.win_height)
+        self.img = self.lib.mlx_new_image(
+            self.mlx, self.win_width, self.win_height
+        )
         if not self.img:
             print("Error: failed to create image.")
             sys.exit(1)
@@ -85,20 +94,23 @@ class MlxDisplay:
         self.draw_maze(self.maze)
 
     def setup_signatures(self) -> None:
-        """Set ctypes signatures."""
+        """Set ctypes return types and argtypes for MLX42 functions.
+        Without this, ctypes assumes all functions return int,
+        which corrupts 64-bit pointers.
+        """
         self.lib.mlx_init.restype = ctypes.c_void_p
         self.lib.mlx_init.argtypes = [
             ctypes.c_int32,
             ctypes.c_int32,
             ctypes.c_char_p,
-            ctypes.c_bool
+            ctypes.c_bool,
         ]
 
         self.lib.mlx_new_image.restype = ctypes.c_void_p
         self.lib.mlx_new_image.argtypes = [
             ctypes.c_void_p,
             ctypes.c_uint32,
-            ctypes.c_uint32
+            ctypes.c_uint32,
         ]
 
         self.lib.mlx_image_to_window.restype = ctypes.c_int
@@ -106,7 +118,7 @@ class MlxDisplay:
             ctypes.c_void_p,
             ctypes.c_void_p,
             ctypes.c_int,
-            ctypes.c_int
+            ctypes.c_int,
         ]
 
         self.lib.mlx_put_pixel.restype = None
@@ -114,17 +126,23 @@ class MlxDisplay:
             ctypes.c_void_p,
             ctypes.c_uint32,
             ctypes.c_uint32,
-            ctypes.c_uint32
+            ctypes.c_uint32,
         ]
 
         self.lib.mlx_loop.restype = None
         self.lib.mlx_loop.argtypes = [ctypes.c_void_p]
 
-        self.lib.mlx_key_hook.restype = None
-        self.lib.mlx_key_hook.argtypes = [
+        self.lib.mlx_loop_hook.restype = None
+        self.lib.mlx_loop_hook.argtypes = [
             ctypes.c_void_p,
             ctypes.c_void_p,
-            ctypes.c_void_p
+            ctypes.c_void_p,
+        ]
+
+        self.lib.mlx_is_key_down.restype = ctypes.c_bool
+        self.lib.mlx_is_key_down.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_int,
         ]
 
         self.lib.mlx_close_window.restype = None
@@ -146,7 +164,6 @@ class MlxDisplay:
         """Draw and fill a rectangle."""
         if x1 > x2 or y1 > y2:
             return
-
         for y in range(y1, y2 + 1):
             for x in range(x1, x2 + 1):
                 self.draw_pixel(x, y, color)
@@ -180,6 +197,11 @@ class MlxDisplay:
         x2: int = x1 + cell_size - 1
         y2: int = y1 + cell_size - 1
 
+        # blocked cells: no walls drawn
+        if cell.is_blocked:
+            self.draw_rectangle(x1, y1, x2, y2, color_blocked)
+            return
+
         self.draw_rectangle(x1, y1, x2, y2, self.get_cell_background(cell))
 
         for offset in range(wall_thickness):
@@ -193,27 +215,27 @@ class MlxDisplay:
                 self.draw_vline(x2 - offset, y1, y2, self.wall_color)
 
     def clear_image(self) -> None:
-        """Clear the image."""
+        """Clear the image with the floor color."""
         self.draw_rectangle(
-            0,
-            0,
+            0, 0,
             self.win_width - 1,
             self.win_height - 1,
             color_floor,
         )
 
     def draw_maze(self, maze: Maze) -> None:
-        """Draw the full maze."""
+        """Draw the full maze grid."""
         self.maze = maze
         self.clear_image()
-
         for row in maze.grid:
             for cell in row:
                 self.draw_cell(cell)
 
     def regenerate(self) -> None:
-        """Generate and draw a new maze."""
-        next_seed: int | None = None if self.seed is None else self.seed + 1
+        """Generate and draw a new maze with an incremented seed."""
+        next_seed: int | None = (
+            None if self.seed is None else self.seed + 1
+        )
         self.seed = next_seed
 
         generator = MazeGenerator(
@@ -233,28 +255,30 @@ class MlxDisplay:
         self.draw_maze(self.maze)
         print(f"Regenerated maze with seed={self.seed}")
 
-    def handle_key(self):
-        """Handles the key choices"""
-        self.last_key = None
+    def _is_just_pressed(self, key: int) -> bool:
+        """Return True only on the first frame a key is held down"""
+        is_down: bool = bool(self.lib.mlx_is_key_down(self.mlx, key))
+        was_down: bool = self.key_pressed.get(key, False)
+        self.key_pressed[key] = is_down
+        return is_down and not was_down
 
-        @ctypes.CFUNCTYPE(None, ctypes.c_int, ctypes.c_void_p)
-        def keys(key, param):
-            if self.last_key == key:
-                return
+    def handle_key(self) -> None:
+        """Register a per-frame loop hook that polls key states"""
+        HookCallback = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
 
-            self.last_key = key
-
-            if key == 256:  # ESC
+        def _hook(param: int) -> None:
+            """Poll keys every frame and act on press edges"""
+            if self._is_just_pressed(KEY_ESC):
                 print("Exit")
                 self.lib.mlx_close_window(self.mlx)
 
-            elif key == 82:  # R
+            elif self._is_just_pressed(KEY_R):
+                print("Regenerating maze...")
                 self.regenerate()
 
-            elif key == 80:  # P
+            elif self._is_just_pressed(KEY_P):
                 self.show_path = not self.show_path
                 print(f"Show path: {self.show_path}")
-                self.path_dirs = shortest_path(self.maze, self.entry, self.exit)
                 if self.show_path:
                     mark_path(self.maze, self.entry, self.path_dirs)
                 else:
@@ -263,16 +287,16 @@ class MlxDisplay:
                             cell.is_path = False
                 self.draw_maze(self.maze)
 
-            elif key == 67:  # C
+            elif self._is_just_pressed(KEY_C):
                 self.color_index = (self.color_index + 1) % len(color_list)
                 self.wall_color = color_list[self.color_index]
-                print(f"Wall color index: {self.color_index}")
+                print(f"Wall color: {self.color_index}")
                 self.draw_maze(self.maze)
 
-        self.lib.mlx_key_hook(self.mlx, keys, None)
-        self.keys_call_back = keys  # Se guarda para que no la elimine el garbage collector
+        self.keys_callback = HookCallback(_hook)
+        self.lib.mlx_loop_hook(self.mlx, self.keys_callback, None)
 
     def run(self) -> None:
-        """Register callbacks and start MLX loop."""
+        """Register key hook and start the MLX42 event loop."""
         self.handle_key()
         self.lib.mlx_loop(self.mlx)

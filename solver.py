@@ -54,8 +54,11 @@ def shortest_path(
     path_dirs: list[str] = []
     current = goal
 
-    while parents[current] is not None:
-        previous, direction = parents[current]
+    while True:
+        entry_data = parents[current]
+        if entry_data is None:
+            break
+        previous, direction = entry_data
         path_dirs.append(DIRECTION_LETTERS[direction])
         current = previous
 
@@ -63,7 +66,10 @@ def shortest_path(
     return path_dirs
 
 
-def mark_path(maze: Maze, entry: tuple[int, int], path_dirs: list[str]) -> None:
+def mark_path(maze: Maze,
+              entry: tuple[int, int],
+              path_dirs: list[str]
+              ) -> None:
     """Mark the cells belonging to the path."""
     maze.reset_search_flags()
 

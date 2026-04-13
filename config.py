@@ -24,7 +24,8 @@ def parse_coords(key: str) -> tuple[int, int]:
     coords = key.split(",")
 
     if len(coords) != 2:
-        raise ValueError(f"Invalid coordinates format: {key} should be in the form 'x,y'.")
+        raise ValueError(f"Invalid coordinates format: {key} should be in the \
+            form 'x,y'.")
 
     try:
         coord1 = int(coords[0].strip())
@@ -61,7 +62,7 @@ def _read_config_file(config_path: str) -> dict[str, str]:
 
                 if '=' not in line:
                     raise ValueError(f"Invalid config syntax: {line}")
-                
+
                 key, _, value = line.partition("=")
                 key = key.strip()
                 value = value.strip()
@@ -73,7 +74,8 @@ def _read_config_file(config_path: str) -> dict[str, str]:
 
             return data
     except FileNotFoundError as exc:
-        raise ValueError(f"Configuration file not found: {config_path}") from exc
+        raise ValueError(f"Configuration file not found: {config_path}") from \
+            exc
 
 
 def validate_conf(config_path: str) -> MazeConfig:
@@ -98,7 +100,7 @@ def validate_conf(config_path: str) -> MazeConfig:
         height = int(data["HEIGHT"])
     except ValueError as exc:
         raise ValueError("WIDTH and HEIGHT must be integers.") from exc
-    
+
     if width <= 0 or height <= 0:
         raise ValueError("WIDTH and HEIGHT must be positive integers.")
 
@@ -114,20 +116,22 @@ def validate_conf(config_path: str) -> MazeConfig:
     if entry_coords == exit_coords:
         raise ValueError("ENTRY and EXIT must be different coordinates")
 
-    if not (0 <= entry_coords[0] < width and
-            0 <= entry_coords[1] < height):
+    if not (
+        0 <= entry_coords[0] < width and 0 <= entry_coords[1] < height
+    ):
         raise ValueError(f"Entry coordinates: {entry_coords} out of bounds.")
 
-    if not (0 <= exit_coords[0] < width and
-            0 <= exit_coords[1] < height):
+    if not (
+        0 <= exit_coords[0] < width and 0 <= exit_coords[1] < height
+    ):
         raise ValueError(f"Exit coordinates: {exit_coords} out of bounds.")
 
     output_file = data["OUTPUT_FILE"].strip()
     if not output_file:
         raise ValueError("OUTPUT_FILE must not be empty.")
-    
+
     perfect = parse_bool(data["PERFECT"])
-    
+
     seed: Optional[int] = None
     if "SEED" in data:
         try:
@@ -135,7 +139,7 @@ def validate_conf(config_path: str) -> MazeConfig:
         except ValueError as exc:
             raise ValueError("SEED must be an integer.") from exc
     else:
-        seed = random.randint(0, 2**32 - 1) # Esta fórmula es por convenio para representar números sin signo en 32 bits.
+        seed = random.randint(0, 2**32 - 1)
 
     random.seed(seed)
 

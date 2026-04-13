@@ -29,7 +29,7 @@ def main() -> int:
         )
         maze = generator.generate()
 
-        path_dirs = shortest_path(maze, config.entry, config.exit)
+        path_dirs: list[str] = shortest_path(maze, config.entry, config.exit)
         mark_path(maze, config.entry, path_dirs)
 
         write_output_file(
@@ -40,7 +40,7 @@ def main() -> int:
             path_dirs=path_dirs,
         )
 
-        display = MlxDisplay(
+        display: MlxDisplay = MlxDisplay(
             maze=maze,
             entry=config.entry,
             exit=config.exit,
