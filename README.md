@@ -260,7 +260,6 @@ The main deviation from the original plan was the time spent on MLX42 integratio
 
 - [MLX42 documentation — Codam Coding College](https://github.com/codam-coding-college/MLX42)
 - [Maze generation algorithms — Wikipedia](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
-- [Depth-first search maze generation — Jamis Buck's blog](http://weblog.jamisbuck.org/2010/12/27/maze-generation-recursive-backtracker)
 - [Breadth-first search — Wikipedia](https://en.wikipedia.org/wiki/Breadth-first_search)
 - [Python ctypes documentation](https://docs.python.org/3/library/ctypes.html)
 - [PEP 557 — Data Classes](https://peps.python.org/pep-0557/)
