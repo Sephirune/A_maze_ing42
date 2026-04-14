@@ -9,7 +9,7 @@ from generator import MazeGenerator
 from maze import Maze
 from solver import mark_path, shortest_path
 
-cell_size: int = 35
+cell_size: int = 4
 wall_thickness: int = 2
 
 color_wall: int = 0xFFFFFFFF
