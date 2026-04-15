@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections import deque
 
-from cell import DIRECTION_LETTERS, DIRECTION_OFFSETS, LETTER_TO_DIRECTION
-from maze import Maze
+from .cell import DIRECTION_LETTERS, DIRECTION_OFFSETS, LETTER_TO_DIRECTION
+from .maze import Maze
 
 
 def shortest_path(

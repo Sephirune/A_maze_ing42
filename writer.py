@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from cell import Cell
-from maze import Maze
+from mazegen.cell import Cell
+from mazegen.maze import Maze
 
 
 def cell_to_hex(cell: Cell) -> str:

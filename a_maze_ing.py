@@ -3,9 +3,9 @@ from __future__ import annotations
 import sys
 
 from config import validate_conf
-from generator import MazeGenerator
+from mazegen import MazeGenerator
 from mlx_display import MlxDisplay
-from solver import mark_path, shortest_path
+from mazegen.solver import mark_path, shortest_path
 from writer import write_output_file
 
 

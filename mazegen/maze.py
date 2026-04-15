@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from cell import ALL_WALLS, Cell, DIRECTION_OFFSETS, OPPOSITE_WALL
+from .cell import ALL_WALLS, Cell, DIRECTION_OFFSETS, OPPOSITE_WALL
 
 
 @dataclass

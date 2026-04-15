@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import random
 
-from cell import ALL_WALLS
-from maze import Maze
+from .cell import ALL_WALLS
+from .maze import Maze
 
 
 class MazeGenerator:

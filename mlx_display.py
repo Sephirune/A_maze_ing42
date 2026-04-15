@@ -4,12 +4,12 @@ import ctypes
 import os
 import sys
 
-from cell import EAST, NORTH, SOUTH, WEST, Cell
-from generator import MazeGenerator
-from maze import Maze
-from solver import mark_path, shortest_path
+from mazegen.cell import EAST, NORTH, SOUTH, WEST, Cell
+from mazegen.generator import MazeGenerator
+from mazegen.maze import Maze
+from mazegen.solver import mark_path, shortest_path
 
-cell_size: int = 4
+cell_size: int = 30
 wall_thickness: int = 2
 
 color_wall: int = 0xFFFFFFFF
